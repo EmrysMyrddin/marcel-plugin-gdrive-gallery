@@ -1,0 +1,71 @@
+<link rel="import" href="style.html">
+<script src="https://cdn.jsdelivr.net/npm/lodash@4.17.4/lodash.min.js"></script>
+<dom-module id="marcel-plugin-gdrive-gallery">
+  <template>
+    <style include="marcel-plugin-gdrive-gallery-style"></style>
+    <div class="photoGallery">
+      <template is="dom-repeat" items="[[photos]]">
+        <div id="[[item.id]]" class$="[[_computeClassname()]]">
+          <img src="[[item.src]]" role="presentation" />
+        </div>
+      </template>
+    </div>
+  </template>
+  <script>
+    (() => {
+
+      const api = (driveFolderId, apikey) => `https://www.googleapis.com/drive/v3/files?q='${driveFolderId}'+in+parents&key=${apikey}`
+      const img = (id, apikey) => `https://drive.google.com/uc?export=view&id=${id}&key=${apikey}`
+
+      class GDriveGallery extends Polymer.Element {
+        static get is() { return 'marcel-plugin-gdrive-gallery' }
+        static get properties() {
+          return {
+            drivefolderid: String,
+            nbphotos: Number,
+            apikey: String,
+            duration: Number,
+          }
+        }
+
+        connectedCallback() {
+          super.connectedCallback();
+          const { drivefolderid, apikey } = this
+          fetch(api(drivefolderid, apikey))
+            .then(response => response.json())
+            .then(json => this._setPhotos(json))
+            .then(() => this._selectRandomPhotos())
+        }
+
+        disconnectedCallback() {
+          if (this.randomizerTimeout) clearTimeout(this.randomizerTimeout)
+        }
+
+        _setPhotos(directory) {
+          const { apikey } = this
+          this.availablePhotos = directory.files.map(({ id }) => ({ id, src: img(id, apikey) }))
+          console.log("Photos found : ", this.availablePhotos)
+        }
+
+        _selectRandomPhotos() {
+          const { nbphotos, duration } = this
+
+          this.photos = _(this.availablePhotos)
+            .shuffle()
+            .take(nbphotos)
+            .value()
+
+          console.log("Photos randomly choosen : ", this.photos)
+
+          this.randomizerTimeout = setTimeout(() => this._selectRandomPhotos(), duration)
+        }
+
+        _computeClassname() {
+          const rndIdx = Math.floor((Math.random() * 3) + 1)
+          return `pic-${rndIdx}`
+        }
+      }
+      customElements.define(GDriveGallery.is, GDriveGallery);
+    })();
+  </script>
+</dom-module>
