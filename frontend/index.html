@@ -5,9 +5,7 @@
     <style include="marcel-plugin-gdrive-gallery-style"></style>
     <div class="photoGallery">
       <template is="dom-repeat" items="[[photos]]">
-        <div id="[[item.id]]" class$="[[_computeClassname()]]">
-          <img src="[[item.src]]" role="presentation" />
-        </div>
+        <img src="[[item.src]]" role="presentation" />
       </template>
     </div>
   </template>
