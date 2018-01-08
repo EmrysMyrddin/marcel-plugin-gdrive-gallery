@@ -17,10 +17,6 @@ class App extends React.Component {
     photos: [],
   }
 
-  componentDidMount() {
-    this.fetchPhotos()
-  }
-
   componentDidUpdate(prevProps) {
     const { apikey, driveFolderId } = this.props
     if (apikey !== prevProps.apikey || driveFolderId !== prevProps.driveFolderId) this.fetchPhotos()
@@ -32,6 +28,7 @@ class App extends React.Component {
 
   fetchPhotos = () => {
     const { driveFolderId, apikey } = this.props
+    console.log(driveFolderId, apikey)
     if (!driveFolderId || !apikey) return
 
     if (this.randomizerTimeout) clearTimeout(this.randomizerTimeout)

@@ -22,7 +22,7 @@ const marcel = Component => {
       switch (type) {
         case 'propsChange':
           console.log('Message reiceived: ', payload)
-          return this.setState({ props: payload })
+          return this.setState({ props: payload.newProps })
         default:
       }
     }
